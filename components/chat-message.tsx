@@ -3,8 +3,47 @@ import { cn } from '../lib/utils';
 
 type MessagePart = UIMessage['parts'][number];
 
-function isTextLikePart(part: MessagePart): part is MessagePart & { text: string } {
-  return 'text' in part && typeof part.text === 'string';
+function renderMessagePart(part: MessagePart, index: number) {
+  if ('text' in part && typeof part.text === 'string') {
+    return (
+      <p key={index} className="whitespace-pre-wrap">
+        {part.text}
+      </p>
+    );
+  }
+
+  const type = 'type' in part ? part.type : undefined;
+
+  if (type === 'step-start') {
+    return (
+      <p key={index} className="text-xs uppercase tracking-wide text-slate-500">
+        Step started…
+      </p>
+    );
+  }
+
+  if (type === 'tool-call') {
+    const toolName = 'toolName' in part ? part.toolName : undefined;
+    return (
+      <p key={index} className="rounded-lg bg-slate-100 px-3 py-2 text-xs font-medium text-slate-600">
+        {toolName ? `Tool call: ${toolName}` : 'Tool call in progress'}
+      </p>
+    );
+  }
+
+  if (type === 'tool-result') {
+    return (
+      <p key={index} className="rounded-lg bg-slate-100 px-3 py-2 text-xs font-medium text-slate-600">
+        Tool result received.
+      </p>
+    );
+  }
+
+  return (
+    <p key={index} className="text-xs text-slate-500">
+      {type ? `[${type} part not displayed]` : '[Unsupported message part]'}
+    </p>
+  );
 }
 
 export function ChatMessage({ message }: { message: UIMessage }) {
@@ -26,38 +65,12 @@ export function ChatMessage({ message }: { message: UIMessage }) {
       >
         {isUser ? 'You' : 'AI'}
       </div>
-      <div className="flex-1 space-y-2 text-sm leading-relaxed text-slate-800">
-        {message.parts.map((part, index) => {
-          if (isTextLikePart(part)) {
-            return (
-              <p key={index} className="whitespace-pre-wrap">
-                {part.text}
-              </p>
-            );
-          }
-
-          if (part.type === 'step-start') {
-            return (
-              <p key={index} className="text-xs uppercase tracking-wide text-slate-500">
-                Step started…
-              </p>
-            );
-          }
-
-          if (part.type.startsWith('tool-') || part.type === 'dynamic-tool') {
-            return (
-              <p key={index} className="rounded-lg bg-slate-100 px-3 py-2 text-xs font-medium text-slate-600">
-                {`Tool update (${part.type.replace('tool-', '')})`}
-              </p>
-            );
-          }
-
-          return (
-            <p key={index} className="text-xs text-slate-500">
-              {`[${part.type} content not displayed]`}
-            </p>
-          );
-        })}
+      <div className="space-y-2 text-sm leading-relaxed text-slate-800">
+        {message.parts.length > 0
+          ? message.parts.map((part, index) => renderMessagePart(part, index))
+          : (
+              <p className="text-xs text-slate-500">[No displayable content]</p>
+            )}
       </div>
     </div>
   );
