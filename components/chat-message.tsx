@@ -1,7 +1,52 @@
-import type { Message } from 'ai';
+import type { UIMessage } from 'ai';
 import { cn } from '../lib/utils';
 
-export function ChatMessage({ message }: { message: Message }) {
+type MessagePart = UIMessage['parts'][number];
+
+function renderMessagePart(part: MessagePart, index: number) {
+  if ('text' in part && typeof part.text === 'string') {
+    return (
+      <p key={index} className="whitespace-pre-wrap">
+        {part.text}
+      </p>
+    );
+  }
+
+  const type = 'type' in part ? part.type : undefined;
+
+  if (type === 'step-start') {
+    return (
+      <p key={index} className="text-xs uppercase tracking-wide text-slate-500">
+        Step started…
+      </p>
+    );
+  }
+
+  if (type === 'tool-call') {
+    const toolName = 'toolName' in part ? part.toolName : undefined;
+    return (
+      <p key={index} className="rounded-lg bg-slate-100 px-3 py-2 text-xs font-medium text-slate-600">
+        {toolName ? `Tool call: ${toolName}` : 'Tool call in progress'}
+      </p>
+    );
+  }
+
+  if (type === 'tool-result') {
+    return (
+      <p key={index} className="rounded-lg bg-slate-100 px-3 py-2 text-xs font-medium text-slate-600">
+        Tool result received.
+      </p>
+    );
+  }
+
+  return (
+    <p key={index} className="text-xs text-slate-500">
+      {type ? `[${type} part not displayed]` : '[Unsupported message part]'}
+    </p>
+  );
+}
+
+export function ChatMessage({ message }: { message: UIMessage }) {
   const isUser = message.role === 'user';
   return (
     <div
@@ -20,9 +65,13 @@ export function ChatMessage({ message }: { message: Message }) {
       >
         {isUser ? 'You' : 'AI'}
       </div>
-      <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-800">
-        {message.content}
-      </p>
+      <div className="space-y-2 text-sm leading-relaxed text-slate-800">
+        {message.parts.length > 0
+          ? message.parts.map((part, index) => renderMessagePart(part, index))
+          : (
+              <p className="text-xs text-slate-500">[No displayable content]</p>
+            )}
+      </div>
     </div>
   );
 }
