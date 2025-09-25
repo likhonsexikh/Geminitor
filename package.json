@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@ai-sdk/google": "^2.0.16",
+    "@ai-sdk/react": "^2.0.52",
+    "@clerk/nextjs": "^6.32.2",
     "ai": "^5.0.52",
     "next": "^14.2.33",
     "react": "^18.3.1",
