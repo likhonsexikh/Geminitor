@@ -1,7 +1,13 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { useChat } from 'ai/react';
+import {
+  type ChangeEvent,
+  type FormEvent,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import { useChat } from '@ai-sdk/react';
 import { ChatMessage } from '../components/chat-message';
 
 const starterPrompts = [
@@ -11,10 +17,29 @@ const starterPrompts = [
 ];
 
 export default function Page() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading, error, setInput, append } = useChat({
-    api: '/api/chat',
-  });
+  const { messages, sendMessage, status, error } = useChat();
+  const [input, setInput] = useState('');
   const endRef = useRef<HTMLDivElement>(null);
+  const isLoading = status === 'submitted' || status === 'streaming';
+
+  const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(event.target.value);
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const trimmed = input.trim();
+    if (trimmed.length === 0 || isLoading) {
+      return;
+    }
+
+    try {
+      await sendMessage({ text: trimmed });
+      setInput('');
+    } catch (sendError) {
+      console.error('Failed to send message', sendError);
+    }
+  };
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -42,7 +67,7 @@ export default function Page() {
               type="button"
               onClick={() => {
                 setInput('');
-                append({ role: 'user', content: prompt });
+                void sendMessage({ text: prompt });
               }}
               className="rounded-full border border-purple-200 bg-white/80 px-4 py-2 text-sm text-purple-700 shadow-sm transition hover:-translate-y-0.5 hover:border-purple-300 hover:bg-white hover:shadow-md"
             >

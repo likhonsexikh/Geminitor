@@ -1,5 +1,9 @@
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
-import { streamText, type ChatRequestBody } from 'ai';
+import { convertToCoreMessages, streamText, type UIMessage } from 'ai';
+
+type ChatRequestBody = {
+  messages: UIMessage[];
+};
 
 const google = createGoogleGenerativeAI({
   apiKey: process.env.GEMINI_API_KEY,
@@ -21,12 +25,18 @@ export async function POST(req: Request) {
     return new Response('Invalid request body', { status: 400 });
   }
 
+  const messagesWithoutIds = body.messages.map((message) => {
+    const { id, ...rest } = message;
+    void id;
+    return rest;
+  });
+
   const result = await streamText({
     model: google('models/gemini-2.0-flash-exp'),
-    messages: body.messages,
+    messages: convertToCoreMessages(messagesWithoutIds),
     temperature: 0.3,
     maxOutputTokens: 2048,
   });
 
-  return result.toDataStreamResponse();
+  return result.toUIMessageStreamResponse();
 }
