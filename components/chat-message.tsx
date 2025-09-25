@@ -1,7 +1,13 @@
-import type { Message } from 'ai';
+import type { UIMessage } from 'ai';
 import { cn } from '../lib/utils';
 
-export function ChatMessage({ message }: { message: Message }) {
+type MessagePart = UIMessage['parts'][number];
+
+function isTextLikePart(part: MessagePart): part is MessagePart & { text: string } {
+  return 'text' in part && typeof part.text === 'string';
+}
+
+export function ChatMessage({ message }: { message: UIMessage }) {
   const isUser = message.role === 'user';
   return (
     <div
@@ -20,9 +26,39 @@ export function ChatMessage({ message }: { message: Message }) {
       >
         {isUser ? 'You' : 'AI'}
       </div>
-      <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-800">
-        {message.content}
-      </p>
+      <div className="flex-1 space-y-2 text-sm leading-relaxed text-slate-800">
+        {message.parts.map((part, index) => {
+          if (isTextLikePart(part)) {
+            return (
+              <p key={index} className="whitespace-pre-wrap">
+                {part.text}
+              </p>
+            );
+          }
+
+          if (part.type === 'step-start') {
+            return (
+              <p key={index} className="text-xs uppercase tracking-wide text-slate-500">
+                Step started…
+              </p>
+            );
+          }
+
+          if (part.type.startsWith('tool-') || part.type === 'dynamic-tool') {
+            return (
+              <p key={index} className="rounded-lg bg-slate-100 px-3 py-2 text-xs font-medium text-slate-600">
+                {`Tool update (${part.type.replace('tool-', '')})`}
+              </p>
+            );
+          }
+
+          return (
+            <p key={index} className="text-xs text-slate-500">
+              {`[${part.type} content not displayed]`}
+            </p>
+          );
+        })}
+      </div>
     </div>
   );
 }
