@@ -7,7 +7,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { useChat } from '@ai-sdk/react';
+import { useChat } from '@ai-sdk/ui/react';
 import { ChatMessage } from '../components/chat-message';
 
 const starterPrompts = [
