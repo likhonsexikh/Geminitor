@@ -65,19 +65,19 @@ const learningHighlights = [
 
 const workflowSteps = [
   {
-    title: 'Build mode',
-    description:
-      'Agent writes code, modifies files, and implements features directly in your project repository.',
-  },
-  {
     title: 'Plan mode',
     description:
-      'Brainstorm architectures, generate task lists, and refine specs—without touching your files.',
+      'Scope releases, prioritize tickets, and share intent before touching the code. The agent keeps a running task list and chain-of-thought notes for teammates.',
   },
   {
-    title: 'Edit mode',
+    title: 'Act mode',
     description:
-      'Target specific snippets with surgical precision, ideal for refactors or accessibility fixes.',
+      'Agent writes code, modifies files, executes terminals, and commits to git-backed sandboxes so you can review diffs before merging.',
+  },
+  {
+    title: 'Iterate mode',
+    description:
+      'Target specific snippets with precision, enforce accessibility, and re-run automated QA until the experience shines on every device.',
   },
 ];
 
@@ -94,6 +94,35 @@ const buildOptions = [
     description:
       'Preview an interactive front-end prototype, then extend it into a production build when you are ready.',
   },
+];
+
+const integrationHighlights = [
+  {
+    title: 'Neon + Postgres',
+    description:
+      'Provision cloud Postgres instances instantly and connect with DATABASE_URL, PGHOST, and other secrets managed by Vercel.',
+  },
+  {
+    title: 'Upstash Redis',
+    description:
+      'Stream session memory and job queues with KV_REST tokens, REDIS_URL, and zero-maintenance serverless caching.',
+  },
+  {
+    title: 'Stack Auth',
+    description:
+      'Protect dashboards with STACK_SECRET_SERVER_KEY and publishable client keys that work across environments.',
+  },
+  {
+    title: 'Grok + Groq APIs',
+    description:
+      'Experiment with XAI and Groq models using project-wide API keys while routing traffic through the AI SDK.',
+  },
+];
+
+const vibeStatements = [
+  'Vibe coding has changed how software gets built.',
+  'Tools like Geminitor turn ideas into working prototypes in seconds.',
+  'shadcn/ui components snap together from natural-language prompts, giving every screen polish out of the box.',
 ];
 
 const toolHighlights = [
@@ -192,6 +221,14 @@ export function LandingPage() {
             <p className="text-lg text-slate-200">
               Geminitor is your AI-powered coding assistant developed by Vercel. Generate responsive interfaces, wire up MCP tools, and orchestrate autonomous agents that run design-to-deploy workflows without leaving chat.
             </p>
+            <ul className="space-y-2 text-sm text-slate-200/80">
+              {vibeStatements.map((statement) => (
+                <li key={statement} className="flex items-start gap-2">
+                  <span aria-hidden className="mt-1 h-1.5 w-1.5 rounded-full bg-purple-300" />
+                  <span>{statement}</span>
+                </li>
+              ))}
+            </ul>
             <div className="flex flex-wrap items-center gap-4 text-sm text-slate-100/80">
               <Link
                 href="#agent-chat"
@@ -455,6 +492,51 @@ for await (const textPart of result.textStream) {
   process.stdout.write(textPart);
 }`}
             />
+          </div>
+        </div>
+      </section>
+
+      <section className="px-6">
+        <div className="mx-auto w-full max-w-6xl space-y-10 rounded-3xl border border-slate-200 bg-white/95 p-10 shadow-xl shadow-purple-100">
+          <header className="space-y-3 text-center">
+            <h2 className="text-3xl font-semibold text-slate-900">Your stack, wired by default</h2>
+            <p className="mx-auto max-w-3xl text-base text-slate-600">
+              Sync environment secrets from Neon, Upstash, Stack, and Grok so every generated workspace mirrors production. Geminitor keeps credentials safe while agents automate provisioning.
+            </p>
+          </header>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {integrationHighlights.map((integration) => (
+              <div key={integration.title} className="flex h-full flex-col justify-between rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-700 shadow-sm">
+                <div className="space-y-2">
+                  <h3 className="text-base font-semibold text-slate-900">{integration.title}</h3>
+                  <p>{integration.description}</p>
+                </div>
+                <span className="mt-4 inline-flex items-center text-xs font-semibold uppercase tracking-wide text-purple-600">Ready for autonomous runs</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="px-6 pb-16">
+        <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 rounded-3xl border border-slate-200 bg-gradient-to-br from-slate-950 via-purple-900 to-indigo-900 p-10 text-center text-white shadow-2xl shadow-purple-200/50">
+          <h2 className="text-4xl font-semibold">Autonomy for every team, from concept to launch</h2>
+          <p className="text-base text-slate-100/80">
+            Launch a protected agent workspace, spin up a fresh git branch, and watch as Geminitor plans, acts, tests, and iterates. Ready to build your autonomous software house?
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
+            <Link
+              href="#agent-chat"
+              className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 font-semibold text-slate-950 shadow-lg shadow-purple-500/40 transition hover:-translate-y-0.5 hover:bg-slate-100"
+            >
+              Open the agent console
+            </Link>
+            <Link
+              href="https://chat-sdk.dev/docs"
+              className="inline-flex items-center justify-center rounded-full border border-white/30 px-6 py-3 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/10"
+            >
+              Read the build guide
+            </Link>
           </div>
         </div>
       </section>
