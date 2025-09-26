@@ -14,18 +14,24 @@ export async function POST(req: Request) {
     return new Response('Missing GEMINI_API_KEY', { status: 500 });
   }
 
-  let body: ChatRequestBody;
+  let body: unknown;
   try {
     body = await req.json();
   } catch {
     return new Response('Invalid JSON payload', { status: 400 });
   }
 
-  if (!Array.isArray(body.messages)) {
+  if (body === null || typeof body !== 'object' || Array.isArray(body)) {
     return new Response('Invalid request body', { status: 400 });
   }
 
-  const messagesWithoutIds = body.messages.map((message) => {
+  const chatBody = body as ChatRequestBody;
+
+  if (!Array.isArray(chatBody.messages)) {
+    return new Response('Invalid request body', { status: 400 });
+  }
+
+  const messagesWithoutIds = chatBody.messages.map((message) => {
     const { id, ...rest } = message;
     void id;
     return rest;
